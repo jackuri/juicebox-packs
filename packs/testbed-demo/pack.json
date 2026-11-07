@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "game": {
+    "id": "testbed-demo",
+    "name": "OpenTrainer Testbed (community demo)",
+    "engine": "native",
+    "exe": "testbed_native.exe",
+    "arch": "x64",
+    "builds": []
+  },
+  "meta": {
+    "author": "OpenTrainer",
+    "created": "2026-11-06",
+    "packVersion": "1.0.0",
+    "notes": "Demo pack for OpenTrainer's fake test game (testbed_native.exe), so you can try installing a community pack. Not for a real game."
+  },
+  "cheats": [
+    {
+      "id": "inf_health",
+      "name": "Infinite Health",
+      "category": "Player",
+      "ui": "toggle",
+      "hotkey": "F1",
+      "description": "Removes the health decrement (sub eax,edx) in the damage code.",
+      "impl": {
+        "kind": "patch",
+        "aob": "0F 1F 80 54 4F 54 01 8B 01 ?? ?? 89 01",
+        "offset": 9,
+        "original": "29 D0",
+        "replace": "90 90"
+      }
+    },
+    {
+      "id": "add_gold",
+      "name": "+1000 Gold",
+      "category": "Inventory",
+      "ui": "button",
+      "hotkey": "F4",
+      "button": {
+        "add": 1000
+      },
+      "impl": {
+        "kind": "value",
+        "type": "i32",
+        "address": {
+          "aob": "0F 1F 80 54 4F 54 03 48 8B 0D ?? ?? ?? ??",
+          "offset": 10,
+          "operand": "rip32",
+          "next": 14,
+          "offsets": [
+            "0x10",
+            "0x10",
+            "0xC"
+          ]
+        }
+      }
+    }
+  ]
+}

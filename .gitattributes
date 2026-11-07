@@ -1,0 +1,2 @@
+# index.json stores the SHA-256 of each pack.json, so keep every file byte-for-byte (LF).
+* text eol=lf
