@@ -14,6 +14,19 @@
       "notes": "Demo pack for OpenTrainer's fake test game (testbed_native.exe), so you can try installing a community pack. Not for a real game.",
       "sha256": "e017c92b906c165cea4c1b8575bee3e278cc3b99b1ad4230a3865ff34e7c6cdd",
       "size": 1407
+    },
+    {
+      "id": "speciesunknown-win64-shipping",
+      "name": "Species Unknown",
+      "exe": "SpeciesUnknown-Win64-Shipping.exe",
+      "arch": "x64",
+      "engine": null,
+      "author": "ai",
+      "packVersion": "0.1.0",
+      "cheats": 5,
+      "notes": "Species Unknown (Unreal Engine 5). Solo play only. Infinite health locks health at 100 (not yet tested against a real hit; the health bar may only redraw after a hit or heal). Infinite ammo locks the gun in hand at 15 bullets (pistol magazine size). Faster movement sets walk speed once (normal is 170); set it again after a new mission if needed. Money is written into the progress save, so it stays once the game saves.",
+      "sha256": "2a0193e1819e9e98201b17a88b4bda6c5986303511bc2da47ec222970a236b5f",
+      "size": 3335
     }
   ]
 }
