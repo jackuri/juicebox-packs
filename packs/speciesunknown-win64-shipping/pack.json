@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "game": {
+    "id": "speciesunknown-win64-shipping",
+    "name": "Species Unknown",
+    "exe": "SpeciesUnknown-Win64-Shipping.exe",
+    "arch": "x64",
+    "builds": [
+      {
+        "sha256": "2715f1708620acfa406781e73744c7bf3dfc076f23487fe57f08878a95d2c53a",
+        "label": "made by the AI helper",
+        "verified": false
+      }
+    ]
+  },
+  "meta": {
+    "author": "ai",
+    "packVersion": "0.1.0",
+    "notes": "Species Unknown (Unreal Engine 5). Solo play only. Infinite health locks health at 100 (not yet tested against a real hit; the health bar may only redraw after a hit or heal). Infinite ammo locks the gun in hand at 15 bullets (pistol magazine size). Faster movement sets walk speed once (normal is 170); set it again after a new mission if needed. Money is written into the progress save, so it stays once the game saves."
+  },
+  "cheats": [
+    {
+      "id": "infinite_health",
+      "name": "Infinite health",
+      "category": "Player",
+      "ui": "toggle",
+      "toggle": {
+        "value": 100
+      },
+      "impl": {
+        "kind": "value",
+        "type": "f32",
+        "address": {
+          "base": "SpeciesUnknown-Win64-Shipping.exe+0x8E2C168",
+          "offsets": [
+            "0x30",
+            "0x358",
+            "0x770"
+          ]
+        }
+      }
+    },
+    {
+      "id": "infinite_stamina",
+      "name": "Infinite stamina",
+      "category": "Player",
+      "ui": "toggle",
+      "toggle": {
+        "value": 1
+      },
+      "impl": {
+        "kind": "value",
+        "type": "u8",
+        "address": {
+          "base": "SpeciesUnknown-Win64-Shipping.exe+0x8E2C168",
+          "offsets": [
+            "0x30",
+            "0x358",
+            "0x1002"
+          ]
+        }
+      }
+    },
+    {
+      "id": "fast_move",
+      "name": "Faster movement",
+      "category": "Player",
+      "description": "Normal walking speed is 170.",
+      "ui": "slider",
+      "slider": {
+        "min": 170,
+        "max": 800,
+        "step": 10,
+        "hold": false
+      },
+      "impl": {
+        "kind": "value",
+        "type": "f64",
+        "address": {
+          "base": "SpeciesUnknown-Win64-Shipping.exe+0x8E2C168",
+          "offsets": [
+            "0x30",
+            "0x358",
+            "0x728"
+          ]
+        }
+      }
+    },
+    {
+      "id": "infinite_ammo",
+      "name": "Infinite ammo (pistol in hand)",
+      "category": "Weapons",
+      "description": "Keeps the magazine of the gun in your hand at 15 bullets.",
+      "ui": "toggle",
+      "toggle": {
+        "value": 15
+      },
+      "impl": {
+        "kind": "value",
+        "type": "i32",
+        "address": {
+          "base": "SpeciesUnknown-Win64-Shipping.exe+0x8E2C168",
+          "offsets": [
+            "0x30",
+            "0x358",
+            "0xB10",
+            "0x524"
+          ]
+        }
+      }
+    },
+    {
+      "id": "money",
+      "name": "Set money",
+      "category": "Progress",
+      "ui": "number",
+      "number": {
+        "min": 0,
+        "max": 9999999,
+        "hold": false
+      },
+      "impl": {
+        "kind": "value",
+        "type": "i32",
+        "address": {
+          "base": "SpeciesUnknown-Win64-Shipping.exe+0x8E49BB8",
+          "offsets": [
+            "0x10",
+            "0x450",
+            "0x48"
+          ]
+        }
+      }
+    }
+  ]
+}
