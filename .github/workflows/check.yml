@@ -1,5 +1,9 @@
 name: Check packs
 
+# Pull requests (most come from the OpenTrainer app's "Share with everyone"):
+# check the packs only. After a merge, index.json is rebuilt and committed
+# here, so pull requests never clash over it.
+
 on:
   pull_request:
   push:
@@ -10,10 +14,40 @@ permissions:
 
 jobs:
   check:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: lts/*
+      - name: Only pack files may change
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          git fetch --no-tags --depth=50 origin "$BASE" "$HEAD"
+          bad=$(git diff --name-only "$BASE" "$HEAD" | grep -v -E '^packs/[a-z0-9][a-z0-9_-]{0,63}/pack\.json$' || true)
+          if [ -n "$bad" ]; then echo "Only packs/<id>/pack.json may change here. Also changed:"; echo "$bad"; exit 1; fi
+      - run: node scripts/build-index.mjs --check --packs-only
+
+  index:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - run: node scripts/build-index.mjs
+      - name: Commit the new list
+        run: |
+          if git diff --quiet -- index.json; then echo "index.json is up to date"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.json
+          git commit -m "Update index.json"
+          git push
       - run: node scripts/build-index.mjs --check

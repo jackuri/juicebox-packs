@@ -1,12 +1,15 @@
 // Builds index.json from packs/<id>/pack.json (same format as `otpack index`).
 //   node scripts/build-index.mjs           write index.json
 //   node scripts/build-index.mjs --check   fail if index.json is out of date or a pack breaks the basic rules
+//   node scripts/build-index.mjs --check --packs-only
+//                                          only the packs (pull requests: index.json is rebuilt after merging)
 // OpenTrainer validates every pack fully before installing it; this only checks what the list needs.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const check = process.argv.includes("--check");
+const packsOnly = process.argv.includes("--packs-only");
 const packsDir = "packs";
 const slug = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 const problems = [];
@@ -56,7 +59,7 @@ for (const id of readdirSync(packsDir).sort()) {
 
 packs.sort((a, b) => String(a.name).toLowerCase().localeCompare(String(b.name).toLowerCase()));
 
-if (check) {
+if (check && !packsOnly) {
   let old;
   try {
     old = JSON.parse(readFileSync("index.json", "utf8"));
@@ -70,7 +73,7 @@ if (check) {
       problems.push("index.json is out of date: run `node scripts/build-index.mjs` and commit it");
     }
   }
-} else {
+} else if (!check) {
   const index = { format: 1, updated: new Date().toISOString().slice(0, 10), packs };
   writeFileSync("index.json", JSON.stringify(index, null, 2) + "\n");
   console.log(`index.json: ${packs.length} pack(s)`);

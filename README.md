@@ -10,12 +10,18 @@ refuses games with anti-cheat.
 
 ## Add your pack
 
+**The easy way (in OpenTrainer 1.4 or newer):** open **Packs**, click **Share with everyone** next to
+your pack, sign in to GitHub once with the code it shows, tick that every cheat works and click
+**Share**. OpenTrainer makes the pull request for you. A maintainer checks it, and after merging the
+list (`index.json`) updates by itself.
+
+**By hand:**
+
 1. In OpenTrainer, make sure the pack works. Load it in **Cheats** and try every cheat.
 2. Fork this repository and add your pack as `packs/<game-id>/pack.json`. The folder name must be
    the pack's `game.id`. Get the file from OpenTrainer's pack folder
    (`%APPDATA%\OpenTrainer\packs\<game-id>\pack.json`, or **Packs → Pack folder**).
-3. Run `node scripts/build-index.mjs` to update `index.json` (or let a maintainer do it).
-4. Open a pull request. Say which game version / store you tested it on.
+3. Open a pull request. Don't edit `index.json`: it is rebuilt after merging. Say which game version / store you tested it on.
 
 ## Rules
 
