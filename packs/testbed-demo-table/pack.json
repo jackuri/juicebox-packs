@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "game": {
+    "id": "testbed-demo-table",
+    "name": "Testbed demo table",
+    "exe": "testbed_native.exe",
+    "builds": []
+  },
+  "meta": {
+    "author": "Cheat Engine table (imported)",
+    "created": "2026-11-08",
+    "packVersion": "1.0.0",
+    "notes": "Converted from the Cheat Engine table \"Testbed demo table\". Credit goes to the table's author (see where you downloaded it). Tables are made for one game version: if a value shows ?? the game was probably updated."
+  },
+  "cheats": [
+    {
+      "id": "health",
+      "name": "Health",
+      "category": "Player",
+      "ui": "number",
+      "number": {
+        "hold": true
+      },
+      "impl": {
+        "kind": "value",
+        "type": "i32",
+        "address": {
+          "base": "testbed_native.exe+0x49200",
+          "offsets": [
+            "0x10",
+            "0x10",
+            "0x0"
+          ]
+        }
+      }
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "category": "Player",
+      "ui": "number",
+      "number": {
+        "hold": true
+      },
+      "impl": {
+        "kind": "value",
+        "type": "u32",
+        "address": {
+          "base": "testbed_native.exe+0x49200",
+          "offsets": [
+            "0x10",
+            "0x10",
+            "0xC"
+          ]
+        }
+      }
+    },
+    {
+      "id": "move-speed",
+      "name": "Move speed",
+      "category": "Player",
+      "ui": "number",
+      "number": {
+        "hold": true
+      },
+      "impl": {
+        "kind": "value",
+        "type": "f32",
+        "address": {
+          "base": "testbed_native.exe+0x49200",
+          "offsets": [
+            "0x10",
+            "0x10",
+            "0x10"
+          ]
+        }
+      }
+    }
+  ]
+}
