@@ -11,8 +11,8 @@ refuses games with anti-cheat.
 ## Add your pack
 
 **The easy way (in OpenTrainer 1.4 or newer):** open **Packs**, click **Share with everyone** next to
-your pack, sign in to GitHub once with the code it shows, tick that every cheat works and click
-**Share**. OpenTrainer makes the pull request for you. A maintainer checks it, and after merging the
+your pack, sign in to GitHub once with the code it shows, tick that every cheat works, say who made
+it and pick the terms (1.17 or newer), and click **Share**. OpenTrainer makes the pull request for you. A maintainer checks it, and after merging the
 list (`index.json`) updates by itself.
 
 **By hand:**
@@ -64,6 +64,25 @@ forum.cheatengine.org, opencheattables.com or github.com. `exe`, `cheats` and `a
 - List the builds you tested (`game.builds` with the exe's SHA-256) when you can, so players see
   "verified for this version".
 
+## Makers choose their terms
+
+When sharing in OpenTrainer (1.17 or newer), you say who made the cheats and pick the terms:
+
+- **Free to reuse and change (MIT)**: the list's default.
+- **Shared with permission; the maker keeps all rights**: players may use the pack, but not
+  re-share or sell it elsewhere without the maker's OK.
+- **Other terms**: one short line, e.g. `CC BY 4.0`.
+
+The terms are kept in the pack (`meta.source.licence`) and shown in OpenTrainer next to the pack,
+with the maker's name, their page and an optional support link (Patreon, Ko-fi, Buy Me a Coffee,
+GitHub or YouTube).
+
+**"Shared by its maker" badge:** a pack whose sharer says they made the cheats
+(`meta.source.fromMaker`) shows this badge. Maintainers merge such a pack only after checking it,
+for example the maker's forum profile or table thread links to the GitHub account that sent it.
+
 ## Licence
 
-Packs here are shared under the MIT licence (see `LICENSE`). By adding a pack you agree to that.
+Packs here are shared under the MIT licence (see `LICENSE`) **unless the pack names other terms in
+`meta.source.licence`**: then those terms apply to that pack. By adding a pack you agree to this,
+and that you made the pack or its maker agreed to share it under the terms you picked.

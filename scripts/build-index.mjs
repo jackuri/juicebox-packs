@@ -52,6 +52,14 @@ for (const id of readdirSync(packsDir).sort()) {
     sha256: createHash("sha256").update(bytes).digest("hex"),
     size: bytes.length,
   };
+  // Credit (OpenTrainer 1.17+ shows it): who made the cheats, their terms and support page.
+  const src = pack.meta?.source;
+  if (src && typeof src === "object") {
+    const source = {};
+    for (const k of ["by", "url", "licence", "support"]) if (typeof src[k] === "string") source[k] = src[k];
+    if (src.fromMaker === true) source.fromMaker = true;
+    if (Object.keys(source).length) entry.source = source;
+  }
   for (const k of ["name", "exe", "author", "packVersion"]) {
     if (typeof entry[k] !== "string" || !entry[k]) problems.push(`${file}: missing ${k}`);
   }
