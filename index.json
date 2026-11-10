@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "updated": "2026-11-08",
+  "updated": "2026-11-10",
   "packs": [
     {
       "id": "testbed-demo",
@@ -28,5 +28,6 @@
       "sha256": "2a0193e1819e9e98201b17a88b4bda6c5986303511bc2da47ec222970a236b5f",
       "size": 3335
     }
-  ]
+  ],
+  "tables": []
 }
