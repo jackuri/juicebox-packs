@@ -23,6 +23,34 @@ list (`index.json`) updates by itself.
    (`%APPDATA%\OpenTrainer\packs\<game-id>\pack.json`, or **Packs → Pack folder**).
 3. Open a pull request. Don't edit `index.json`: it is rebuilt after merging. Say which game version / store you tested it on.
 
+## Add a link to a Cheat Engine table
+
+Many games have free Cheat Engine tables (`.CT` files) made by players on forums such as
+FearLess Revolution. This list can point to them, so OpenTrainer can show "Tables other players
+found" for a game (OpenTrainer 1.16 or newer). **Only the link is listed: the table stays on its
+maker's page**, and players download it from there, which credits its maker.
+
+**The easy way:** in OpenTrainer, turn a table into cheats (fill in who made it and its page), then
+in **Packs** click **Share the table's link** next to it.
+
+**By hand:** add `tables/<id>.json`:
+
+```json
+{
+  "id": "hollow-knight-0123456789",
+  "game": "Hollow Knight",
+  "exe": "hollow_knight.exe",
+  "title": "Hollow Knight v1.5 table",
+  "by": "The table's maker",
+  "url": "https://fearlessrevolution.com/viewtopic.php?t=…",
+  "cheats": 12,
+  "added": "2026-11-09"
+}
+```
+
+The page must be the table's own page, over `https`, on fearlessrevolution.com,
+forum.cheatengine.org, opencheattables.com or github.com. `exe`, `cheats` and `added` are optional.
+
 ## Rules
 
 - **Single-player games only.** No online or multiplayer games, and no games with anti-cheat.
