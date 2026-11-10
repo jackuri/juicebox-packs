@@ -51,10 +51,46 @@ in **Packs** click **Share the table's link** next to it.
 The page must be the table's own page, over `https`, on fearlessrevolution.com,
 forum.cheatengine.org, opencheattables.com or github.com. `exe`, `cheats` and `added` are optional.
 
+## Add cheats for a web game
+
+OpenTrainer 1.19 or newer can share the cheats a player found for a game that runs in a web page
+(Web games tab). They're small, so the list carries them whole.
+
+**The easy way:** in OpenTrainer's **Web games** tab, click **Share** next to the game, then
+**Share with everyone**.
+
+**By hand:** add `web/<id>.json` (the `.otweb` file OpenTrainer saves has the same contents):
+
+```json
+{
+  "format": 1,
+  "id": "zombie-run-1a2b3c4d5e",
+  "game": "Zombie Run",
+  "url": "https://zombies.example/play",
+  "by": "Who found the cheats",
+  "notes": "works from level 2",
+  "added": "2026-11-10",
+  "cheats": [
+    { "name": "Ammo", "target": { "k": "j", "path": ["game", "ammo"] }, "value": 99, "key": "F3" },
+    { "name": "Health", "target": { "k": "m", "mem": 0, "label": "module memory", "size": 65536, "off": 4096, "t": "i32" }, "value": 100 }
+  ]
+}
+```
+
+A cheat is a place (`"k": "j"`: a JavaScript value by its path from `window`; `"k": "m"`: an offset
+in one of the page's memories, with `t` one of `u8`, `i16`, `i32`, `f32`, `f64`) and the value to
+set or lock it to. `key` and `keyDoes` (`lock` or `set`) are optional. The address must be the
+game's own `https` page. At most 50 cheats.
+
+Web cheats are for playing alone or in private games with friends you invited. They're not
+accepted for competitive games (ranked matches, PvP, leaderboards) or for games where items can be
+bought, sold or traded for real money.
+
 ## Rules
 
-- **Single-player games only.** No online or multiplayer games, and no games with anti-cheat.
-  OpenTrainer refuses those anyway; packs for them are closed.
+- **Single-player games only** (packs for PC games). No online or multiplayer games, and no games
+  with anti-cheat. OpenTrainer refuses those anyway; packs for them are closed. Web cheats have
+  their own rules (above).
 - **No game files.** A pack holds names, offsets and short byte patterns only. No extracted
   assets, no decompiled code, no executables.
 - **Only `pack.json`** in a pack's folder.

@@ -1,5 +1,6 @@
-// Builds index.json from packs/<id>/pack.json and tables/<id>.json (links to Cheat Engine tables
-// on their makers' pages; OpenTrainer 1.16.0+ shows them; older versions ignore them).
+// Builds index.json from packs/<id>/pack.json, tables/<id>.json (links to Cheat Engine tables
+// on their makers' pages; OpenTrainer 1.16.0+ shows them; older versions ignore them) and
+// web/<id>.json (cheats for web games; OpenTrainer 1.19.0+).
 //   node scripts/build-index.mjs           write index.json
 //   node scripts/build-index.mjs --check   fail if index.json is out of date or a pack breaks the basic rules
 //   node scripts/build-index.mjs --check --packs-only
@@ -139,6 +140,92 @@ tables.sort(
     String(a.game).toLowerCase().localeCompare(String(b.game).toLowerCase()) || String(a.title).localeCompare(String(b.title)),
 );
 
+// ----- web cheats --------------------------------------------------------------
+// web/<id>.json: cheats for a game that runs in a web page (OpenTrainer 1.19.0+ shows them; older
+// versions ignore them). Same rules as OpenTrainer's `web::check_pack` for the list (the app checks
+// them again). They're small, so the index carries them whole.
+const WEB_FIELDS = new Set(["format", "id", "game", "url", "by", "notes", "added", "cheats"]);
+const CHEAT_FIELDS = new Set(["name", "target", "value", "key", "keyDoes"]);
+const NUM_TYPES = ["u8", "i16", "i32", "f32", "f64"];
+const LOCAL = new Set(["localhost", "127.0.0.1", "[::1]"]);
+function webHost(url) {
+  if (typeof url !== "string" || url.length > 1000 || /[\s"<>]/.test(url) || CONTROL.test(url)) return null;
+  const m = /^https:\/\/([^/?#]+)/.exec(url);
+  if (!m || m[1].includes("@")) return null;
+  const host = m[1].toLowerCase().replace(/:\d+$/, "");
+  if (!/^[a-z0-9][a-z0-9.-]*$/.test(host) || LOCAL.has(host)) return null;
+  return host;
+}
+function cheatProblem(c) {
+  if (!c || typeof c !== "object" || Array.isArray(c)) return "not an object";
+  const extra = Object.keys(c).filter((k) => !CHEAT_FIELDS.has(k));
+  if (extra.length) return `unknown fields ${extra.join(", ")}`;
+  if (!oneLine(c.name, 80)) return "name must be a short single line";
+  const t = c.target;
+  const whole = (n, max) => Number.isInteger(n) && n >= 0 && n <= max;
+  if (t?.k === "m") {
+    const keys = Object.keys(t).filter((k) => !["k", "mem", "label", "size", "off", "t"].includes(k));
+    const label = typeof t.label === "string" && [...t.label].length <= 200 && !CONTROL.test(t.label);
+    if (keys.length || !whole(t.mem, 2 ** 32) || !label || !whole(t.size, Number.MAX_SAFE_INTEGER) || !whole(t.off, 2 ** 40) || !NUM_TYPES.includes(t.t)) {
+      return "bad memory place";
+    }
+  } else if (t?.k === "j") {
+    const keys = Object.keys(t).filter((k) => k !== "k" && k !== "path");
+    const path = Array.isArray(t.path) && t.path.length > 0 && t.path.length <= 16;
+    if (keys.length || !path || t.path.some((p) => typeof p !== "string" || p === "" || [...p].length > 120 || CONTROL.test(p))) {
+      return "bad JavaScript path";
+    }
+  } else return "target must be a memory place (k: m) or a JavaScript path (k: j)";
+  if (c.value != null && !(typeof c.value === "number" && Number.isFinite(c.value))) return "value must be a number";
+  if (c.key != null && !(oneLine(c.key, 40) && /^[A-Za-z0-9+*\-./]+$/.test(c.key))) return "bad key";
+  if (c.keyDoes != null && !["lock", "set"].includes(c.keyDoes)) return "keyDoes must be lock or set";
+  if (c.keyDoes === "set" && c.value == null) return "a key that sets a value needs the value";
+  return null;
+}
+const web = [];
+const webDir = "web";
+if (existsSync(webDir)) {
+  for (const name of readdirSync(webDir).sort()) {
+    const file = join(webDir, name);
+    const id = name.replace(/\.json$/, "");
+    if (!name.endsWith(".json") || !slug.test(id)) {
+      problems.push(`${file}: must be web/<lowercase-id>.json`);
+      continue;
+    }
+    const bytes = readFileSync(file);
+    if (bytes.length > 64 * 1024) problems.push(`${file}: bigger than 64 KB`);
+    let w;
+    try {
+      w = JSON.parse(bytes.toString("utf8"));
+    } catch (e) {
+      problems.push(`${file}: not valid JSON (${e.message})`);
+      continue;
+    }
+    const extra = Object.keys(w).filter((k) => !WEB_FIELDS.has(k));
+    if (extra.length) problems.push(`${file}: unknown fields ${extra.join(", ")}`);
+    if (w.format !== 1) problems.push(`${file}: format must be 1`);
+    if (w.id !== id) problems.push(`${file}: id is ${w.id} but the file is ${id}.json`);
+    if (!oneLine(w.game, 120) || !oneLine(w.by, 100)) problems.push(`${file}: game and by must be short single lines`);
+    if (w.notes != null && !oneLine(w.notes, 500)) problems.push(`${file}: notes must be one line (up to 500 characters)`);
+    if (w.added != null && !/^\d{4}-\d{2}-\d{2}$/.test(w.added)) problems.push(`${file}: added must be YYYY-MM-DD`);
+    if (!webHost(w.url)) problems.push(`${file}: url must be the game's https page (not on your own PC)`);
+    if (!Array.isArray(w.cheats) || w.cheats.length === 0 || w.cheats.length > 50) {
+      problems.push(`${file}: needs 1 to 50 cheats`);
+    } else {
+      w.cheats.forEach((c, i) => {
+        const why = cheatProblem(c);
+        if (why) problems.push(`${file}: cheat ${i + 1}: ${why}`);
+      });
+    }
+    const entry = { format: 1, id, game: w.game, url: w.url, by: w.by };
+    if (w.notes != null) entry.notes = w.notes;
+    if (w.added != null) entry.added = w.added;
+    entry.cheats = Array.isArray(w.cheats) ? w.cheats : [];
+    web.push(entry);
+  }
+}
+web.sort((a, b) => String(a.game).toLowerCase().localeCompare(String(b.game).toLowerCase()) || a.id.localeCompare(b.id));
+
 if (check && !packsOnly) {
   let old;
   try {
@@ -149,18 +236,18 @@ if (check && !packsOnly) {
   if (old) {
     const strip = (list) => JSON.stringify(list);
     if (old.format !== 1) problems.push("index.json: format must be 1");
-    if (strip(old.packs) !== strip(packs) || strip(old.tables ?? []) !== strip(tables)) {
+    if (strip(old.packs) !== strip(packs) || strip(old.tables ?? []) !== strip(tables) || strip(old.web ?? []) !== strip(web)) {
       problems.push("index.json is out of date: run `node scripts/build-index.mjs` and commit it");
     }
   }
 } else if (!check) {
-  const index = { format: 1, updated: new Date().toISOString().slice(0, 10), packs, tables };
+  const index = { format: 1, updated: new Date().toISOString().slice(0, 10), packs, tables, web };
   writeFileSync("index.json", JSON.stringify(index, null, 2) + "\n");
-  console.log(`index.json: ${packs.length} pack(s), ${tables.length} table link(s)`);
+  console.log(`index.json: ${packs.length} pack(s), ${tables.length} table link(s), ${web.length} web game(s)`);
 }
 
 if (problems.length) {
   for (const p of problems) console.error(p);
   process.exit(1);
 }
-if (check) console.log(`ok: ${packs.length} pack(s), ${tables.length} table link(s)`);
+if (check) console.log(`ok: ${packs.length} pack(s), ${tables.length} table link(s), ${web.length} web game(s)`);
