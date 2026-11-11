@@ -1,11 +1,11 @@
 // Builds index.json from packs/<id>/pack.json, tables/<id>.json (links to Cheat Engine tables
-// on their makers' pages; OpenTrainer 1.16.0+ shows them; older versions ignore them) and
-// web/<id>.json (cheats for web games; OpenTrainer 1.19.0+).
+// on their makers' pages; JuiceBox Trainer 1.16.0+ shows them; older versions ignore them) and
+// web/<id>.json (cheats for web games; JuiceBox Trainer 1.19.0+).
 //   node scripts/build-index.mjs           write index.json
 //   node scripts/build-index.mjs --check   fail if index.json is out of date or a pack breaks the basic rules
 //   node scripts/build-index.mjs --check --packs-only
 //                                          only the packs (pull requests: index.json is rebuilt after merging)
-// OpenTrainer validates every pack fully before installing it; this only checks what the list needs.
+// JuiceBox Trainer validates every pack fully before installing it; this only checks what the list needs.
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -53,7 +53,7 @@ for (const id of readdirSync(packsDir).sort()) {
     sha256: createHash("sha256").update(bytes).digest("hex"),
     size: bytes.length,
   };
-  // Credit (OpenTrainer 1.17+ shows it): who made the cheats, their terms and support page.
+  // Credit (JuiceBox Trainer 1.17+ shows it): who made the cheats, their terms and support page.
   const src = pack.meta?.source;
   if (src && typeof src === "object") {
     const source = {};
@@ -70,7 +70,7 @@ for (const id of readdirSync(packsDir).sort()) {
 packs.sort((a, b) => String(a.name).toLowerCase().localeCompare(String(b.name).toLowerCase()));
 
 // ----- table links -----------------------------------------------------------
-// Same rules as OpenTrainer's `community::table_problem` (the app checks them again).
+// Same rules as JuiceBox Trainer's `community::table_problem` (the app checks them again).
 const TABLE_SITES = [
   "fearlessrevolution.com",
   "www.fearlessrevolution.com",
@@ -141,8 +141,8 @@ tables.sort(
 );
 
 // ----- web cheats --------------------------------------------------------------
-// web/<id>.json: cheats for a game that runs in a web page (OpenTrainer 1.19.0+ shows them; older
-// versions ignore them). Same rules as OpenTrainer's `web::check_pack` for the list (the app checks
+// web/<id>.json: cheats for a game that runs in a web page (JuiceBox Trainer 1.19.0+ shows them; older
+// versions ignore them). Same rules as JuiceBox Trainer's `web::check_pack` for the list (the app checks
 // them again). They're small, so the index carries them whole.
 const WEB_FIELDS = new Set(["format", "id", "game", "url", "by", "notes", "added", "cheats"]);
 const CHEAT_FIELDS = new Set(["name", "target", "value", "key", "keyDoes"]);

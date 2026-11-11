@@ -1,6 +1,6 @@
 name: Check packs
 
-# Pull requests (most come from the OpenTrainer app's "Share with everyone"):
+# Pull requests (most come from the JuiceBox Trainer app's "Share with everyone"):
 # check the packs only. After a merge, index.json is rebuilt and committed
 # here, so pull requests never clash over it.
 

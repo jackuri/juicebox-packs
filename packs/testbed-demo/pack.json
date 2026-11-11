@@ -2,17 +2,17 @@
   "schema": 1,
   "game": {
     "id": "testbed-demo",
-    "name": "OpenTrainer Testbed (community demo)",
+    "name": "JuiceBox Trainer Testbed (community demo)",
     "engine": "native",
     "exe": "testbed_native.exe",
     "arch": "x64",
     "builds": []
   },
   "meta": {
-    "author": "OpenTrainer",
+    "author": "JuiceBox Trainer",
     "created": "2026-11-06",
     "packVersion": "1.0.0",
-    "notes": "Demo pack for OpenTrainer's fake test game (testbed_native.exe), so you can try installing a community pack. Not for a real game."
+    "notes": "Demo pack for JuiceBox Trainer's fake test game (testbed_native.exe), so you can try installing a community pack. Not for a real game."
   },
   "cheats": [
     {
