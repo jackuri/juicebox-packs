@@ -1,0 +1,30 @@
+name: Cheat request
+description: Ask the community for cheats for a game (JuiceBox Trainer's "Ask the community" fills this in).
+title: "Cheats for: "
+labels: ["request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask for cheats for a **single-player** game (or its offline mode). Games with anti-cheat running,
+        and cheats that affect other players online, aren't taken.
+        Already asked? Add a 👍 to that request instead: the most-wanted games are shown in JuiceBox Trainer.
+  - type: input
+    id: game
+    attributes:
+      label: Game
+      description: The game's name as it shows in your launcher.
+      placeholder: Hollow Knight
+    validations:
+      required: true
+  - type: input
+    id: exe
+    attributes:
+      label: Game program (optional)
+      description: The game's .exe name, if you know it. JuiceBox Trainer fills it in.
+      placeholder: hollow_knight.exe
+  - type: textarea
+    id: wishes
+    attributes:
+      label: Which cheats? (optional)
+      placeholder: Infinite health, lots of gold

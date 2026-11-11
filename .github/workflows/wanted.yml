@@ -1,0 +1,42 @@
+name: Most wanted
+
+# Collects open "request" issues (games players asked cheats for) into wanted.json, which
+# JuiceBox Trainer shows as "Most wanted". Issue text is untrusted: the script only reads it as
+# data (no shell, no links taken from it).
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled, deleted]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: wanted
+  cancel-in-progress: false
+
+jobs:
+  wanted:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - run: node scripts/build-wanted.mjs --test
+      - run: node scripts/build-wanted.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit the list
+        run: |
+          if git diff --quiet -- wanted.json; then echo "wanted.json is up to date"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add wanted.json
+          git commit -m "Update wanted.json"
+          git pull --rebase
+          git push

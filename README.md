@@ -86,6 +86,15 @@ Web cheats are for playing alone or in private games with friends you invited. T
 accepted for competitive games (ranked matches, PvP, leaderboards) or for games where items can be
 bought, sold or traded for real money.
 
+## Ask for cheats
+
+No cheats for a game yet? In JuiceBox Trainer 1.25 or newer, click **Ask the community for cheats** on
+the game in **Games**: it opens a [request](https://github.com/jackuri/juicebox-packs/issues/new?template=cheat-request.yml)
+here, filled in. Already asked by someone? Add a 👍 to their request instead. The requests with the
+most votes show as **Most wanted** in JuiceBox Trainer (`wanted.json`, rebuilt every hour), so players
+who have the game can make the cheats with the AI helper and share them. Single-player games (or
+their offline mode) only.
+
 ## Rules
 
 - **Single-player games only** (packs for PC games). No online or multiplayer games, and no games
