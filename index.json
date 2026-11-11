@@ -30,5 +30,105 @@
     }
   ],
   "tables": [],
-  "web": []
+  "web": [
+    {
+      "format": 1,
+      "id": "outbreak-07307fbbf2",
+      "game": "Outbreak",
+      "url": "https://www.outbreakweb.com/",
+      "by": "Jack",
+      "notes": "the infinite pistol ammo works only with the pistol found in File 1 on the bar, Lock to 99. Set zombies to 1, dont lock or they'll be invincible.",
+      "added": "2026-11-11",
+      "cheats": [
+        {
+          "name": "Infinite health (Kevin)",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 7455796,
+            "t": "i16"
+          },
+          "value": 2300,
+          "key": "F5",
+          "keyDoes": "lock"
+        },
+        {
+          "name": "Infinite pistol ammo",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 6535624,
+            "t": "i32"
+          },
+          "value": 99,
+          "key": "F6",
+          "keyDoes": "lock"
+        },
+        {
+          "name": "Weak enemy 1 (1 HP)",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 7124308,
+            "t": "i16"
+          },
+          "value": 1
+        },
+        {
+          "name": "Weak enemy 2 (1 HP)",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 7127780,
+            "t": "i16"
+          },
+          "value": 1
+        },
+        {
+          "name": "Weak enemy 3 (1 HP)",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 7131252,
+            "t": "i16"
+          },
+          "value": 1
+        },
+        {
+          "name": "Weak enemy 4 (1 HP)",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 7134724,
+            "t": "i16"
+          },
+          "value": 1
+        },
+        {
+          "name": "Weak enemy 5 (1 HP)",
+          "target": {
+            "k": "m",
+            "mem": 0,
+            "label": "memory",
+            "size": 322174976,
+            "off": 7138196,
+            "t": "i16"
+          },
+          "value": 1
+        }
+      ]
+    }
+  ]
 }
