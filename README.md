@@ -105,6 +105,15 @@ Web cheats are for playing alone or in private games with friends you invited. T
 accepted for competitive games (ranked matches, PvP, leaderboards) or for games where items can be
 bought, sold or traded for real money.
 
+## Ratings
+
+Players rate every pack from 1 to 3 stars in JuiceBox Trainer 1.29 or newer: ★ broken, ★★ works
+but has bugs, ★★★ works great. Each pack has a **Rate: <pack id>** issue (made by a robot, label
+`rating`); a rating is a reaction on it (👍 3 stars, 😕 2, 👎 1; only your newest counts). The robot
+counts them every hour into `ratings.json`, and JuiceBox Trainer shows the stars and can put the
+best packs first. Found a bug in a pack? Comment on its rating issue: which cheat, your game version
+and what happened.
+
 ## Ask for cheats
 
 No cheats for a game yet? In JuiceBox Trainer 1.25 or newer, click **Ask the community for cheats** on

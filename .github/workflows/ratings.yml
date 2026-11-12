@@ -1,0 +1,43 @@
+name: Ratings
+
+# Makes a "Rate: <pack id>" issue for every community pack and counts its rating reactions
+# (👍 3 stars, 😕 2, 👎 1; one per GitHub account) into ratings.json, which JuiceBox Trainer shows.
+# Only reaction kinds and who reacted are read; nothing people write is used.
+
+on:
+  push:
+    branches: [main]
+    paths: [index.json]
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: ratings
+  cancel-in-progress: false
+
+jobs:
+  ratings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - run: node scripts/build-ratings.mjs --test
+      - run: node scripts/build-ratings.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit the ratings
+        run: |
+          if git diff --quiet -- ratings.json 2>/dev/null && git ls-files --error-unmatch ratings.json >/dev/null 2>&1; then echo "ratings.json is up to date"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ratings.json
+          git commit -m "Update ratings.json"
+          git pull --rebase
+          git push
