@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "updated": "2026-11-12",
+  "rules": {
+    "pack": 10,
+    "rating": 2
+  },
+  "players": [
+    {
+      "login": "jackuri",
+      "xp": 20,
+      "packs": 2,
+      "ratings": 0
+    }
+  ]
+}

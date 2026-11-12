@@ -1,0 +1,45 @@
+name: XP
+
+# Counts every player's packer XP into xp.json, which JuiceBox Trainer shows as their level, title
+# and the leaderboard: 10 XP per pack or web cheats file accepted here (merged pull requests), 2 XP per
+# pack rated (a reaction on its rating issue). Only who opened merged pull requests, which files they
+# added, and who reacted are read; nothing people write is used.
+
+on:
+  push:
+    branches: [main]
+    paths: [index.json]
+  schedule:
+    - cron: "47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: xp
+  cancel-in-progress: false
+
+jobs:
+  xp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+      - run: node scripts/build-xp.mjs --test
+      - run: node scripts/build-xp.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit the XP
+        run: |
+          if git diff --quiet -- xp.json 2>/dev/null && git ls-files --error-unmatch xp.json >/dev/null 2>&1; then echo "xp.json is up to date"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add xp.json
+          git commit -m "Update xp.json"
+          git pull --rebase
+          git push

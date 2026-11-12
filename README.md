@@ -114,6 +114,33 @@ counts them every hour into `ratings.json`, and JuiceBox Trainer shows the stars
 best packs first. Found a bug in a pack? Comment on its rating issue: which cheat, your game version
 and what happened.
 
+## Levels and titles
+
+Sharing and rating earn packer XP, shown in JuiceBox Trainer 1.32 or newer as your level (1 to 99),
+your title and a leaderboard. A robot counts it every hour from GitHub itself into `xp.json`, so
+nobody can give themselves XP:
+
+- **10 XP** for each pack or web cheats file of yours that's accepted into this list (a merged pull
+  request that added it; a pack counts once, and only while it's listed);
+- **2 XP** for each pack you rate (once per pack, your own too; changing a rating doesn't add more).
+
+Level 2 takes 10 XP, and each next level 10 XP more than the one before (level L needs
+5 × L × (L − 1) XP in all; level 99 needs 48,510).
+
+| Title | From level |
+|---|---|
+| Recruit Packer | 1 |
+| Pack Rat | 3 |
+| Intern Packer | 5 |
+| Pro Packer | 10 |
+| Pack Master | 20 |
+| Leader of the Pack | 30 |
+| Pack King | 45 |
+| Pack Legend | 60 |
+| Pack God | 99 |
+
+The leaderboard shows GitHub names, which are public on GitHub anyway.
+
 ## Ask for cheats
 
 No cheats for a game yet? In JuiceBox Trainer 1.25 or newer, click **Ask the community for cheats** on
