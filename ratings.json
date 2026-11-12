@@ -1,5 +1,26 @@
 {
   "format": 1,
   "updated": "2026-11-12",
-  "ratings": {}
+  "ratings": {
+    "testbed-demo": {
+      "issue": 4,
+      "count": 0,
+      "stars": 0,
+      "votes": [
+        0,
+        0,
+        0
+      ]
+    },
+    "speciesunknown-win64-shipping": {
+      "issue": 5,
+      "count": 0,
+      "stars": 0,
+      "votes": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
 }
