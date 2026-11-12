@@ -51,6 +51,25 @@ in **Packs** click **Share the table's link** next to it.
 The page must be the table's own page, over `https`, on fearlessrevolution.com,
 forum.cheatengine.org, opencheattables.com or github.com. `exe`, `cheats` and `added` are optional.
 
+### The table itself (only with its maker's OK)
+
+If the table's maker gave it an **open licence** (CC-BY-4.0, CC0-1.0, CC-BY-SA-4.0, MIT, Apache-2.0
+or GPL-3.0-or-later) or said it may be shared here, the table itself can be here too, so players turn
+it into cheats in one click (JuiceBox Trainer 1.27 or newer). Put it next to its link as
+`tables/<id>.CT` and add to the link:
+
+```json
+  "licence": "CC-BY-4.0",
+  "file": "tables/<id>.CT",
+  "sha256": "<SHA-256 of the .CT file>"
+```
+
+For the maker's permission, use `"licence": "Shared with permission; all rights kept by the maker"`.
+JuiceBox Trainer's **Share the table's link** does all of this when you choose to include the table.
+**Maintainers check the licence or permission on the table's own page before merging.** Tables
+without one stay on their maker's page: only the link is here. Never copy tables or cheats from paid
+trainer apps (WeMod, FLiNG, Cheat Happens and the like).
+
 ## Add cheats for a web game
 
 JuiceBox Trainer 1.19 or newer can share the cheats a player found for a game that runs in a web page

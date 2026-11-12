@@ -29,8 +29,8 @@ jobs:
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
           git fetch --no-tags --depth=50 origin "$BASE" "$HEAD"
-          bad=$(git diff --name-only "$BASE" "$HEAD" | grep -v -E '^(packs/[a-z0-9][a-z0-9_-]{0,63}/pack\.json|tables/[a-z0-9][a-z0-9_-]{0,63}\.json|web/[a-z0-9][a-z0-9_-]{0,63}\.json)$' || true)
-          if [ -n "$bad" ]; then echo "Only packs/<id>/pack.json, tables/<id>.json and web/<id>.json may change here. Also changed:"; echo "$bad"; exit 1; fi
+          bad=$(git diff --name-only "$BASE" "$HEAD" | grep -v -E '^(packs/[a-z0-9][a-z0-9_-]{0,63}/pack\.json|tables/[a-z0-9][a-z0-9_-]{0,63}\.json|tables/[a-z0-9][a-z0-9_-]{0,63}\.CT|web/[a-z0-9][a-z0-9_-]{0,63}\.json)$' || true)
+          if [ -n "$bad" ]; then echo "Only packs/<id>/pack.json, tables/<id>.json, tables/<id>.CT and web/<id>.json may change here. Also changed:"; echo "$bad"; exit 1; fi
       - run: node scripts/build-index.mjs --check --packs-only
 
   index:

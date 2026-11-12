@@ -1,5 +1,6 @@
 // Builds index.json from packs/<id>/pack.json, tables/<id>.json (links to Cheat Engine tables
-// on their makers' pages; JuiceBox Trainer 1.16.0+ shows them; older versions ignore them) and
+// on their makers' pages; JuiceBox Trainer 1.16.0+ shows them; older versions ignore them; a table
+// whose maker gave it an open licence or permission may be here too, as tables/<id>.CT, 1.27.0+) and
 // web/<id>.json (cheats for web games; JuiceBox Trainer 1.19.0+).
 //   node scripts/build-index.mjs           write index.json
 //   node scripts/build-index.mjs --check   fail if index.json is out of date or a pack breaks the basic rules
@@ -79,7 +80,18 @@ const TABLE_SITES = [
   "www.opencheattables.com",
   "github.com",
 ];
-const TABLE_FIELDS = new Set(["id", "game", "exe", "title", "by", "url", "cheats", "added"]);
+const TABLE_FIELDS = new Set(["id", "game", "exe", "title", "by", "url", "cheats", "added", "licence", "file", "sha256"]);
+// Terms under which the table itself may be here (as JuiceBox Trainer's `community::HOSTING_LICENCES`).
+const HOSTING_LICENCES = [
+  "CC-BY-4.0",
+  "CC0-1.0",
+  "CC-BY-SA-4.0",
+  "MIT",
+  "Apache-2.0",
+  "GPL-3.0-or-later",
+  "Shared with permission; all rights kept by the maker",
+];
+const MAX_TABLE_FILE = 2 << 20;
 const CONTROL = /[\u0000-\u001f\u007f-\u009f]/;
 const oneLine = (s, max) => typeof s === "string" && s.trim() !== "" && [...s].length <= max && !CONTROL.test(s);
 function tableSite(url) {
@@ -93,11 +105,17 @@ const tables = [];
 const tablesDir = "tables";
 const seenUrls = new Set();
 if (existsSync(tablesDir)) {
-  for (const name of readdirSync(tablesDir).sort()) {
+  const names = readdirSync(tablesDir).sort();
+  for (const name of names) {
     const file = join(tablesDir, name);
+    if (name.endsWith(".CT")) {
+      // A table file needs its link, which names it (checked below).
+      if (!names.includes(name.replace(/\.CT$/, ".json"))) problems.push(`${file}: has no tables/<id>.json link`);
+      continue;
+    }
     const id = name.replace(/\.json$/, "");
     if (!name.endsWith(".json") || !slug.test(id)) {
-      problems.push(`${file}: must be tables/<lowercase-id>.json`);
+      problems.push(`${file}: must be tables/<lowercase-id>.json (or the table itself, tables/<id>.CT)`);
       continue;
     }
     const bytes = readFileSync(file);
@@ -121,6 +139,22 @@ if (existsSync(tablesDir)) {
     if (t.exe != null && (!oneLine(t.exe, 120) || /[/\\:]/.test(t.exe))) problems.push(`${file}: exe must be a file name`);
     if (t.cheats != null && !(Number.isInteger(t.cheats) && t.cheats >= 0)) problems.push(`${file}: cheats must be a whole number`);
     if (t.added != null && !/^\d{4}-\d{2}-\d{2}$/.test(t.added)) problems.push(`${file}: added must be YYYY-MM-DD`);
+    if (t.licence != null && !oneLine(t.licence, 100)) problems.push(`${file}: licence must be a short single line`);
+    if (t.file != null || t.sha256 != null || existsSync(join(tablesDir, `${id}.CT`))) {
+      const ct = join(tablesDir, `${id}.CT`);
+      if (t.file !== `tables/${id}.CT`) problems.push(`${file}: file must be tables/${id}.CT`);
+      if (!HOSTING_LICENCES.includes(t.licence)) {
+        problems.push(`${file}: the table itself may only be here under one of: ${HOSTING_LICENCES.join(", ")}`);
+      }
+      if (!existsSync(ct)) {
+        problems.push(`${file}: ${ct} is missing`);
+      } else {
+        const bytes = readFileSync(ct);
+        if (bytes.length > MAX_TABLE_FILE) problems.push(`${ct}: bigger than 2 MB`);
+        if (!bytes.toString("utf8").includes("<CheatTable")) problems.push(`${ct}: not a Cheat Engine table`);
+        if (createHash("sha256").update(bytes).digest("hex") !== t.sha256) problems.push(`${file}: sha256 doesn't match ${ct}`);
+      }
+    }
     if (seenUrls.has(t.url)) problems.push(`${file}: this page is already listed`);
     seenUrls.add(t.url);
     tables.push({
@@ -132,6 +166,8 @@ if (existsSync(tablesDir)) {
       url: t.url,
       cheats: t.cheats ?? null,
       added: t.added ?? null,
+      ...(t.licence != null ? { licence: t.licence } : {}),
+      ...(t.file != null ? { file: t.file, sha256: t.sha256 } : {}),
     });
   }
 }
