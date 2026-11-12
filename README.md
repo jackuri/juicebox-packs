@@ -116,9 +116,10 @@ their offline mode) only.
 
 ## Rules
 
-- **Single-player games only** (packs for PC games). No online or multiplayer games, and no games
-  with anti-cheat. JuiceBox Trainer refuses those anyway; packs for them are closed. Web cheats have
-  their own rules (above).
+- **Games without anti-cheat** (packs for PC games): single-player, co-op with friends, and online
+  games that have no anti-cheat. No games with anti-cheat: JuiceBox Trainer refuses those anyway, and
+  packs for them are closed. Please don't make cheats meant to spoil other players' fun in public,
+  competitive or ranked play. Web cheats have their own rules (above).
 - **No game files.** A pack holds names, offsets and short byte patterns only. No extracted
   assets, no decompiled code, no executables.
 - **Only `pack.json`** in a pack's folder.
