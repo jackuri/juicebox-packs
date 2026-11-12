@@ -3,14 +3,19 @@
   "updated": "2026-11-12",
   "rules": {
     "pack": 10,
-    "rating": 2
+    "rating": 2,
+    "day": 2,
+    "streak": 10
   },
   "players": [
     {
       "login": "jackuri",
       "xp": 20,
       "packs": 2,
-      "ratings": 0
+      "ratings": 0,
+      "days": 0,
+      "streak": 0,
+      "lastDay": null
     }
   ]
 }
