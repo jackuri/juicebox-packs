@@ -3,7 +3,12 @@
 //   10 XP  for each pack or web cheats file of yours accepted into this list (a merged pull request
 //          that added packs/<id>/pack.json or web/<id>.json, still listed in index.json);
 //    2 XP  for each pack you rated (a 👍 😕 or 👎 reaction on its "Rate: <pack id>" issue; once per
-//          pack, your own included; changing your rating doesn't add more).
+//          pack, your own included; changing your rating doesn't add more);
+//    2 XP  for each day you checked in (JuiceBox Trainer 1.33+ adds a reaction to that day's
+//          "Check-in: YYYY-MM-DD" issue when you open it; only a reaction GitHub dated that same day
+//          (UTC) counts), and 10 XP more for every 5 days in a row.
+// The robot opens each day's check-in issue, and closes and locks the ones before. Counted days are
+// kept in checkins.json, so old check-in issues needn't be read again.
 // Bots don't count. Nothing people write is read: only who opened merged pull requests and which
 // files they added, and who reacted on the rating issues.
 //
@@ -16,7 +21,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 
 const repo = process.env.GITHUB_REPOSITORY ?? "jackuri/juicebox-packs";
 const token = process.env.GITHUB_TOKEN;
-export const XP = { pack: 10, rating: 2 };
+export const XP = { pack: 10, rating: 2, day: 2, streak: 10 };
+/** Days in a row for the streak reward. */
+export const STREAK = 5;
+const CHECK_IN = "Check-in: ";
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const RATINGS = new Set(["+1", "confused", "-1"]);
 const slug = "[a-z0-9][a-z0-9_-]{0,63}";
 const PACK_FILE = new RegExp(`^packs/(${slug})/pack\\.json$`);
@@ -51,10 +60,49 @@ const human = (u) => u && typeof u.login === "string" && LOGIN.test(u.login) && 
  * `ratings`: reactions on the rating issues, each { issue, reactions: [...] }; `listed`: pack and web ids
  * on the list now. A pack counts once, for whoever's merged pull request added it first.
  */
-export function score(prs, ratings, listed) {
+/** The day after a "YYYY-MM-DD" day. */
+const nextDay = (d) => new Date(Date.parse(`${d}T00:00:00Z`) + 86400000).toISOString().slice(0, 10);
+
+/** Who checked in on a day: reactions by people, made (as GitHub dates them) on that day. */
+export function checkedIn(day, reactions) {
+  return [...new Set((reactions ?? []).filter((r) => human(r?.user) && String(r.created_at ?? "").startsWith(day)).map((r) => r.user.login))].sort();
+}
+
+/**
+ * Check-in days and streaks: `days` (day → logins). For each player, how many days, the reward for
+ * every 5 days in a row, and their streak as of `today` (days in a row ending today or yesterday).
+ */
+export function streaks(days, today) {
+  const byPlayer = new Map();
+  for (const [day, logins] of Object.entries(days)) {
+    if (!DAY.test(day)) continue;
+    for (const login of logins) {
+      if (!byPlayer.has(login)) byPlayer.set(login, []);
+      byPlayer.get(login).push(day);
+    }
+  }
+  const out = new Map();
+  const yesterday = new Date(Date.parse(`${today}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
+  for (const [login, list] of byPlayer) {
+    const sorted = [...new Set(list)].sort();
+    let bonuses = 0;
+    let run = 0;
+    let prev = null;
+    for (const d of sorted) {
+      run = prev && nextDay(prev) === d ? run + 1 : 1;
+      if (run % STREAK === 0) bonuses += 1;
+      prev = d;
+    }
+    const last = sorted.at(-1);
+    out.set(login, { days: sorted.length, bonuses, streak: last === today || last === yesterday ? run : 0, lastDay: last });
+  }
+  return out;
+}
+
+export function score(prs, ratings, listed, days = {}, today = new Date().toISOString().slice(0, 10)) {
   const players = new Map();
   const get = (login) => {
-    if (!players.has(login)) players.set(login, { login, xp: 0, packs: 0, ratings: 0 });
+    if (!players.has(login)) players.set(login, { login, xp: 0, packs: 0, ratings: 0, days: 0, streak: 0, lastDay: null });
     return players.get(login);
   };
   const credited = new Set();
@@ -79,6 +127,14 @@ export function score(prs, ratings, listed) {
       p.xp += XP.rating;
     }
   }
+  for (const [login, s] of streaks(days, today)) {
+    if (!LOGIN.test(login)) continue;
+    const p = get(login);
+    p.days = s.days;
+    p.streak = s.streak;
+    p.lastDay = s.lastDay;
+    p.xp += s.days * XP.day + s.bonuses * XP.streak;
+  }
   return [...players.values()].sort((a, b) => b.xp - a.xp || a.login.localeCompare(b.login)).slice(0, MAX_PLAYERS);
 }
 
@@ -101,12 +157,36 @@ function test() {
     listed,
   );
   const want = [
-    { login: "ann", xp: 14, packs: 1, ratings: 2 },
-    { login: "bob", xp: 10, packs: 1, ratings: 0 },
-    { login: "cy", xp: 2, packs: 0, ratings: 1 },
+    { login: "ann", xp: 14, packs: 1, ratings: 2, days: 0, streak: 0, lastDay: null },
+    { login: "bob", xp: 10, packs: 1, ratings: 0, days: 0, streak: 0, lastDay: null },
+    { login: "cy", xp: 2, packs: 0, ratings: 1, days: 0, streak: 0, lastDay: null },
   ];
+  // Check-ins: Dee 6 days in a row (2 × 6 + 10), then a gap; Eve 5 then 5 more after a gap (2 × 10 + 20).
+  const days = {};
+  const add = (login, from, n) => {
+    let d = from;
+    for (let i = 0; i < n; i++) {
+      (days[d] ??= []).push(login);
+      d = nextDay(d);
+    }
+  };
+  add("dee", "2026-11-01", 6);
+  add("eve", "2026-11-03", 5);
+  add("eve", "2026-11-09", 5); // to 2026-11-13: today
+  const st = score([], [], new Set(), days, "2026-11-13");
+  const dee = st.find((p) => p.login === "dee");
+  const eve = st.find((p) => p.login === "eve");
+  const late = checkedIn("2026-11-12", [
+    { user: { login: "ann" }, created_at: "2026-11-12T23:59:00Z" },
+    { user: { login: "bob" }, created_at: "2026-11-13T00:01:00Z" }, // the next day: doesn't count here
+    { user: { login: "bot", type: "Bot" }, created_at: "2026-11-12T10:00:00Z" },
+    { user: { login: "ann" }, created_at: "2026-11-12T08:00:00Z" },
+  ]);
   const ok =
     JSON.stringify(players) === JSON.stringify(want) &&
+    dee?.xp === 22 && dee.days === 6 && dee.streak === 0 &&
+    eve?.xp === 40 && eve.days === 10 && eve.streak === 5 && eve.lastDay === "2026-11-13" &&
+    JSON.stringify(late) === '["ann"]' &&
     xpFor(2) === 10 &&
     xpFor(3) === 30 &&
     levelFor(0) === 1 &&
@@ -124,16 +204,69 @@ function test() {
   process.exit(ok ? 0 : 1);
 }
 
-async function api(path) {
+async function api(path, options = {}) {
   const r = await fetch(`https://api.github.com${path}`, {
+    ...options,
     headers: {
       accept: "application/vnd.github+json",
       "x-github-api-version": "2022-11-28",
       ...(token ? { authorization: `Bearer ${token}` } : {}),
+      ...(options.body ? { "content-type": "application/json" } : {}),
     },
   });
   if (!r.ok) throw new Error(`GitHub answered ${r.status} for ${path}`);
-  return r.json();
+  return r.status === 204 ? null : r.json();
+}
+
+/**
+ * Today's check-in issue is open (made if needed); earlier ones are closed and locked. Returns the
+ * counted days (day → logins): from checkins.json, with the last days read again from GitHub.
+ */
+async function checkIns(today) {
+  let kept = {};
+  try {
+    kept = JSON.parse(readFileSync("checkins.json", "utf8")).days ?? {};
+  } catch {
+    /* first run */
+  }
+  const issues = await all(`/repos/${repo}/issues?state=all&labels=check-in`);
+  const ofDay = (i) => {
+    const t = String(i.title ?? "");
+    const d = t.startsWith(CHECK_IN) ? t.slice(CHECK_IN.length).trim() : "";
+    return DAY.test(d) && !i.pull_request ? d : null;
+  };
+  if (!issues.some((i) => ofDay(i) === today)) {
+    const made = await api(`/repos/${repo}/issues`, {
+      method: "POST",
+      body: JSON.stringify({
+        title: `${CHECK_IN}${today}`,
+        labels: ["check-in"],
+        body: [
+          `Daily check-in for **${today}** (UTC).`,
+          "",
+          "JuiceBox Trainer 1.33 or newer adds a 👍 here for you when you open it today, if you turned on the daily check-in (click your level at the bottom of the menu). Every day you check in gives 2 XP, and every 5 days in a row 10 XP more.",
+          "",
+          "Only reactions made today count. This page closes when the day ends.",
+        ].join("\n"),
+      }),
+    });
+    issues.push(made);
+    console.log(`made today's check-in: #${made.number}`);
+  }
+  const days = { ...kept };
+  const recent = new Date(Date.parse(`${today}T00:00:00Z`) - 3 * 86400000).toISOString().slice(0, 10);
+  for (const i of issues) {
+    const d = ofDay(i);
+    if (!d || d > today) continue;
+    if (!(d in kept) || d >= recent) days[d] = checkedIn(d, await all(`/repos/${repo}/issues/${i.number}/reactions`));
+    if (d < today && i.state === "open") {
+      await api(`/repos/${repo}/issues/${i.number}`, { method: "PATCH", body: JSON.stringify({ state: "closed" }) });
+      await api(`/repos/${repo}/issues/${i.number}/lock`, { method: "PUT", body: JSON.stringify({ lock_reason: "resolved" }) });
+    }
+  }
+  const sorted = Object.fromEntries(Object.entries(days).sort(([a], [b]) => a.localeCompare(b)));
+  writeFileSync("checkins.json", JSON.stringify({ format: 1, days: sorted }, null, 2) + "\n");
+  return sorted;
 }
 
 async function all(path) {
@@ -159,7 +292,9 @@ async function main() {
     if (i.pull_request || !String(i.title ?? "").startsWith("Rate: ")) continue;
     ratings.push({ issue: i.number, reactions: await all(`/repos/${repo}/issues/${i.number}/reactions`) });
   }
-  const players = score(prs, ratings, listed);
+  const today = new Date().toISOString().slice(0, 10);
+  const days = await checkIns(today);
+  const players = score(prs, ratings, listed, days, today);
   let old = null;
   try {
     old = JSON.parse(readFileSync("xp.json", "utf8"));

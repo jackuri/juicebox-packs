@@ -2,7 +2,8 @@ name: XP
 
 # Counts every player's packer XP into xp.json, which JuiceBox Trainer shows as their level, title
 # and the leaderboard: 10 XP per pack or web cheats file accepted here (merged pull requests), 2 XP per
-# pack rated (a reaction on its rating issue). Only who opened merged pull requests, which files they
+# pack rated (a reaction on its rating issue), 2 XP per daily check-in (a reaction on that day's
+# check-in issue, which this robot opens each day and closes after) and 10 more per 5 days in a row. Only who opened merged pull requests, which files they
 # added, and who reacted are read; nothing people write is used.
 
 on:
@@ -11,12 +12,14 @@ on:
     paths: [index.json]
   schedule:
     - cron: "47 * * * *"
+    # Right after midnight UTC: open the new day's check-in issue.
+    - cron: "2 0 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: read
-  issues: read
+  issues: write
 
 concurrency:
   group: xp
@@ -36,10 +39,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit the XP
         run: |
-          if git diff --quiet -- xp.json 2>/dev/null && git ls-files --error-unmatch xp.json >/dev/null 2>&1; then echo "xp.json is up to date"; exit 0; fi
+          if git diff --quiet -- xp.json checkins.json 2>/dev/null && git ls-files --error-unmatch xp.json checkins.json >/dev/null 2>&1; then echo "xp.json is up to date"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add xp.json
+          git add xp.json checkins.json
           git commit -m "Update xp.json"
           git pull --rebase
           git push

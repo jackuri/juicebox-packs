@@ -123,6 +123,11 @@ nobody can give themselves XP:
 - **10 XP** for each pack or web cheats file of yours that's accepted into this list (a merged pull
   request that added it; a pack counts once, and only while it's listed);
 - **2 XP** for each pack you rate (once per pack, your own too; changing a rating doesn't add more).
+- **2 XP** for each day you check in, and **10 XP** more for every 5 days in a row. JuiceBox Trainer
+  1.33 or newer checks you in when you open it, once you turn on the daily check-in (click your
+  level at the bottom of its menu): it adds a 👍 to that day's **Check-in: YYYY-MM-DD** issue (label
+  `check-in`), which the robot opens at midnight UTC and closes when the day ends. Only a reaction
+  made that day counts, so days go by UTC. Counted days are kept in `checkins.json`.
 
 Level 2 takes 10 XP, and each next level 10 XP more than the one before (level L needs
 5 × L × (L − 1) XP in all; level 99 needs 48,510).
