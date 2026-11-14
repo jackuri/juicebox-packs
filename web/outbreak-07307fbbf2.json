@@ -4,96 +4,106 @@
   "game": "Outbreak",
   "url": "https://www.outbreakweb.com/",
   "by": "Jack",
-  "notes": "the infinite pistol ammo works only with the pistol found in File 1 on the bar, Lock to 99. Set zombies to 1, dont lock or they'll be invincible.",
-  "added": "2026-11-11",
+  "added": "2026-11-14",
   "cheats": [
     {
-      "name": "Infinite health (Kevin)",
-      "target": {
-        "k": "m",
-        "mem": 0,
-        "label": "memory",
-        "size": 322174976,
-        "off": 7455796,
-        "t": "i16"
-      },
-      "value": 2300.0,
-      "key": "F5",
-      "keyDoes": "lock"
-    },
-    {
-      "name": "Infinite pistol ammo",
-      "target": {
-        "k": "m",
-        "mem": 0,
-        "label": "memory",
-        "size": 322174976,
-        "off": 6535624,
-        "t": "i32"
-      },
-      "value": 99.0,
-      "key": "F6",
-      "keyDoes": "lock"
-    },
-    {
-      "name": "Weak enemy 1 (1 HP)",
+      "name": "Weak zombies (all, 1 HP)",
       "target": {
         "k": "m",
         "mem": 0,
         "label": "memory",
         "size": 322174976,
         "off": 7124308,
-        "t": "i16"
+        "t": "i16",
+        "every": 3472,
+        "count": 10
       },
-      "value": 1.0
+      "value": 1.0,
+      "keep": "atMost"
     },
     {
-      "name": "Weak enemy 2 (1 HP)",
+      "name": "Infinite ammo (Kevin's pistol + second gun)",
       "target": {
         "k": "m",
         "mem": 0,
         "label": "memory",
         "size": 322174976,
-        "off": 7127780,
-        "t": "i16"
+        "off": 6535624,
+        "t": "i32",
+        "every": 5040,
+        "count": 2
       },
-      "value": 1.0
+      "value": 99.0,
+      "key": "F6",
+      "keyDoes": "lock"
     },
     {
-      "name": "Weak enemy 3 (1 HP)",
+      "name": "Infinite health (my character, any)",
       "target": {
         "k": "m",
         "mem": 0,
         "label": "memory",
         "size": 322174976,
-        "off": 7131252,
-        "t": "i16"
+        "off": 7455796,
+        "t": "i16",
+        "every": 2,
+        "count": 2
       },
-      "value": 1.0
+      "value": 3000.0,
+      "key": "F5",
+      "keyDoes": "lock"
     },
     {
-      "name": "Weak enemy 4 (1 HP)",
+      "name": "Infinite First Aid Spray (Kevin's starting spray)",
       "target": {
         "k": "m",
         "mem": 0,
         "label": "memory",
         "size": 322174976,
-        "off": 7134724,
-        "t": "i16"
+        "off": 6535504,
+        "t": "i32"
       },
-      "value": 1.0
+      "value": 3.0
     },
     {
-      "name": "Weak enemy 5 (1 HP)",
+      "name": "Infinite nail gun ammo",
       "target": {
         "k": "m",
         "mem": 0,
         "label": "memory",
         "size": 322174976,
-        "off": 7138196,
-        "t": "i16"
+        "off": 6536404,
+        "t": "i32"
       },
-      "value": 1.0
+      "value": 99.0,
+      "key": "F7",
+      "keyDoes": "lock"
+    },
+    {
+      "name": "Infinite revolver ammo",
+      "target": {
+        "k": "m",
+        "mem": 0,
+        "label": "memory",
+        "size": 322174976,
+        "off": 6537124,
+        "t": "i32"
+      },
+      "value": 99.0
+    },
+    {
+      "name": "No virus (whole team)",
+      "target": {
+        "k": "m",
+        "mem": 0,
+        "label": "memory",
+        "size": 322174976,
+        "off": 7457436,
+        "t": "i32",
+        "every": 4320,
+        "count": 3
+      },
+      "value": 0.0
     }
   ]
 }
