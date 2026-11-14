@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "rules": {
     "pack": 10,
     "rating": 2,
@@ -12,6 +12,15 @@
       "login": "jackuri",
       "xp": 22,
       "packs": 2,
+      "ratings": 0,
+      "days": 1,
+      "streak": 1,
+      "lastDay": "2026-11-13"
+    },
+    {
+      "login": "BOMBRAT007",
+      "xp": 2,
+      "packs": 0,
       "ratings": 0,
       "days": 1,
       "streak": 1,
