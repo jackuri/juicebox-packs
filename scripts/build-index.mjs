@@ -181,7 +181,11 @@ tables.sort(
 // versions ignore them). Same rules as JuiceBox Trainer's `web::check_pack` for the list (the app checks
 // them again). They're small, so the index carries them whole.
 const WEB_FIELDS = new Set(["format", "id", "game", "url", "by", "notes", "added", "cheats"]);
-const CHEAT_FIELDS = new Set(["name", "target", "value", "key", "keyDoes"]);
+const CHEAT_FIELDS = new Set(["name", "target", "value", "key", "keyDoes", "keep"]);
+// JuiceBox Trainer 1.31.0+: a lock that keeps the number at its value, never above it, or never below it.
+const KEEPS = ["at", "atMost", "atLeast"];
+// JuiceBox Trainer 1.31.0+: a group of places ("every" bytes apart, "count" of them; both or neither).
+const MAX_GROUP = 1024;
 const NUM_TYPES = ["u8", "i16", "i32", "f32", "f64"];
 const LOCAL = new Set(["localhost", "127.0.0.1", "[::1]"]);
 function webHost(url) {
@@ -200,10 +204,17 @@ function cheatProblem(c) {
   const t = c.target;
   const whole = (n, max) => Number.isInteger(n) && n >= 0 && n <= max;
   if (t?.k === "m") {
-    const keys = Object.keys(t).filter((k) => !["k", "mem", "label", "size", "off", "t"].includes(k));
+    const keys = Object.keys(t).filter((k) => !["k", "mem", "label", "size", "off", "t", "every", "count"].includes(k));
     const label = typeof t.label === "string" && [...t.label].length <= 200 && !CONTROL.test(t.label);
     if (keys.length || !whole(t.mem, 2 ** 32) || !label || !whole(t.size, Number.MAX_SAFE_INTEGER) || !whole(t.off, 2 ** 40) || !NUM_TYPES.includes(t.t)) {
       return "bad memory place";
+    }
+    if (t.every != null || t.count != null) {
+      const ok =
+        Number.isInteger(t.every) && t.every >= 1 && t.every <= 2 ** 20 &&
+        Number.isInteger(t.count) && t.count >= 2 && t.count <= MAX_GROUP &&
+        t.off + t.every * t.count <= 2 ** 40;
+      if (!ok) return `a group needs "every" (1 to 1048576 bytes) and "count" (2 to ${MAX_GROUP} places)`;
     }
   } else if (t?.k === "j") {
     const keys = Object.keys(t).filter((k) => k !== "k" && k !== "path");
@@ -211,11 +222,15 @@ function cheatProblem(c) {
     if (keys.length || !path || t.path.some((p) => typeof p !== "string" || p === "" || [...p].length > 120 || CONTROL.test(p))) {
       return "bad JavaScript path";
     }
+    // "*" stands for every item of a list (at most two, never first or last).
+    const stars = t.path.filter((p) => p === "*").length;
+    if (stars > 2 || t.path[0] === "*" || t.path.at(-1) === "*") return "bad JavaScript path";
   } else return "target must be a memory place (k: m) or a JavaScript path (k: j)";
   if (c.value != null && !(typeof c.value === "number" && Number.isFinite(c.value))) return "value must be a number";
   if (c.key != null && !(oneLine(c.key, 40) && /^[A-Za-z0-9+*\-./]+$/.test(c.key))) return "bad key";
   if (c.keyDoes != null && !["lock", "set"].includes(c.keyDoes)) return "keyDoes must be lock or set";
   if (c.keyDoes === "set" && c.value == null) return "a key that sets a value needs the value";
+  if (c.keep != null && !KEEPS.includes(c.keep)) return `keep must be ${KEEPS.join(", ")}`;
   return null;
 }
 const web = [];
