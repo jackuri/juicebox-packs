@@ -1,6 +1,6 @@
 {
   "format": 1,
-  "updated": "2026-11-14",
+  "updated": "2026-11-15",
   "rules": {
     "pack": 10,
     "rating": 2,
@@ -23,7 +23,7 @@
       "packs": 0,
       "ratings": 0,
       "days": 1,
-      "streak": 1,
+      "streak": 0,
       "lastDay": "2026-11-13"
     }
   ]
